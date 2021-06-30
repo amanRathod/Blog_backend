@@ -9,20 +9,7 @@ module.exports = function (passport) {
       usernameField: 'email'
     },
     async (email, password, done) => {
-      // User.findOne({ email: email }, (err, user) => {
-      //   if (err) throw err;
-      //   if (!user) return done(null, false, { message: 'That email is not registered' });
-  
-      //   bcrypt.compare(password, user.password, (err, result) => {
-          
-      //     if (result === true) {
-      //       return done(null, user);
-      //     } else {
-      //       console.log(err)
-      //       return done(null, false,{ message: 'Password is Invalid'});
-      //     }
-      //   });
-      // });
+    
       try {
 
         // verify Email

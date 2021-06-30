@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser')
 const MongoStore = require('connect-mongo')
 
 const app = express();
+app.disable('x-powered-by');
 
 dotenv.config({path: './config/dot.env'});
 
@@ -38,7 +39,7 @@ app.use(
   session({
     cookie:{
       secure: true,
-      maxAge:60000
+      maxAge: 60000
          },
     secret: process.env.SECRET,
     resave: true,
@@ -62,7 +63,7 @@ app.use(passport.session());
 
 
 
-app.use('/auth', require('./routes/auth'))
+app.use('/auth', require('./routes/Reset_Password'))
 app.use('/user', require('./routes/Login_User'))
 
 const PORT = process.env.PORT || 4444

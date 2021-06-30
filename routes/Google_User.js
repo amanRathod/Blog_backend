@@ -1,16 +1,23 @@
 const express = require('express')
+const passport = require('passport')
 const router = express.Router();
 
-router.get('/login', async (req, res) => {
-  try{
+// @ GET auth/google
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] } ));
 
-  }
-  catch(err) {
-    console.error(err)
-    process.exit(1);
-  }
-})
+// @ GET auth/google/callback
 
-module.exports = {
-  GoogleRoute: router,
-}
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    failureMessage: "some error occured",
+  }),
+  (req, res) => {
+    // res.send('LoggedIn successfully')
+    res.redirect('/') 
+  }
+  
+)
+
+module.exports = router

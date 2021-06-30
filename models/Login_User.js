@@ -24,15 +24,15 @@ const mongoose = require('mongoose')
 //   accounts: [
 //     { type: mongoose.Schema.Types.ObjectId,
 //       ref: 'Google_User',
-//       required: true
+//       
 //     },
 //     { type: mongoose.Schema.Types.ObjectId,
 //       ref: 'Login_User',
-//       required: true
+//       
 //     },
 //     { type: mongoose.Schema.Types.ObjectId,
 //       ref: 'Github_User',
-//       required: true
+//       
 //     }
 //  ]
 // })
@@ -51,6 +51,13 @@ const UserSchema =  new mongoose.Schema({
     required: true,
   },
   password: {
+    type: String,
+    required: true,
+  },
+  resetToken: {
+    type: String,
+  },
+  expireToken: {
     type: String,
   },
   createdAt: {
@@ -76,8 +83,9 @@ const UserSchema =  new mongoose.Schema({
       githubId: {
         type: String,
         }
-    }
-  ],
+  }
+],
+
 })
 
 

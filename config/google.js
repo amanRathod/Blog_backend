@@ -15,27 +15,26 @@ module.exports = function (passport) {
         
         const newUser = {
           googleId: profile.id,
-          displayName: profile.displayName,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
           email: profile.email[0].value,
           image: profile.photos[0].value
         }
 
-        // let user =  await User.findOne({googleId: profile.id});
+        let user =  await User.findOne({googleId: profile.id});
 
-        // try{
-        //   if(user){
-        //     return done(null, user)
-        //   }
-        //   else {
-        //     user = User.create(newUser);
-        //     done(null, user)
-        //   }
-        // }
-        // catch(err) {
-        //   console.error(err)
-        // }
+        try{
+          if(user){
+            return done(null, user)
+          }
+          else {
+            user = User.create(newUser);
+            done(null, user)
+          }
+        }
+        catch(err) {
+          console.error(err);
+        }
       }
     )
   )

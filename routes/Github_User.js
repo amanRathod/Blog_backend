@@ -1,15 +1,21 @@
 const express = require('express');
+const passport = require('passport');
 const router = express.Router();
 
-router.get('/login', async (req, res) => {
-  try{
-    
+router.get('/github', passport.authenticate('github', { scope: ['email', 'profile'] }) );
+
+router.get(
+  "/github/callback",
+  passport.authenticate("github", {
+    failureRedirect: "/login",
+    failureMessage: "some error occured",
+  }),
+  (req, res) => {
+    // res.send('LoggedIn successfully')
+    res.redirect('/') 
   }
-  catch(err){
-    console.error(err)
-    process.exit(1)
-  }
-})
+  
+)
 
 module.exports = {
   GithubRoute: router,

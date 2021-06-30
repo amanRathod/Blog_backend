@@ -8,28 +8,11 @@ const User = require('../models/Login_User');
 //@path user/register
 router.post('/register',  async (req, res) => {
 
-  /** Different method for validation */
-  // User.findOne({ email: req.body.email }, async (err, doc) => {
-  //   if (err) throw err;
-  //   if (doc) res.send("User Already Exists");
-  //   if (!doc) {
-  //     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-  //     const newUser = new User({
-  //       firstName: req.body.firstName,
-  //       lastName: req.body.lastName,
-  //       email: req.body.email,
-  //       password: hashedPassword,
-  //     });
-  //     await newUser.save();
-  //     res.send("User Created");
-  //   }
-  // });
 
   const { firstName, lastName, email, password, confirmPassword } = req.body;
   let error = {};
 
-  /** will uncomment during production mode */
+  
   // if(email !== /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/){
   //   error.email = 'Please enter a valid email address'
   // }
@@ -88,7 +71,7 @@ router.post('/login/', (req, res, next) => {
     
     if (err) throw err;
 
-    console.log('errmessagee', info)
+   
     if (!user) res.status(203).json(info);
     else if(info !== undefined) res.status(203).json(info)
     else {
