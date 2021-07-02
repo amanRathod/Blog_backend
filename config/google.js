@@ -12,16 +12,16 @@ module.exports = function (passport) {
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log('prfile -> ', profile)
+        console.log('Email -> ', profile.emails[0].value)
         
         const newUser = {
-          googleId: profile.id,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
-          email: profile.email[0].value,
+          email: profile.emails[0].value,
           image: profile.photos[0].value
         }
 
-        let user =  await User.findOne({googleId: profile.id});
+        let user =  await User.findOne({email: profile.emails[0].value});
 
         try{
           if(user){

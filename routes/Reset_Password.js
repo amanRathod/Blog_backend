@@ -7,18 +7,21 @@ const nodemailer = require('nodemailer');
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 const User = require('../models/Login_User')
 
-const transport = nodemailer.createTransport(
-  nodemailerSendgrid({
-      apiKey: process.env.SENDGRID_API_KEY
-  })
-);
+const transport = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "44240336e52ed7",
+    pass: "b8876322f864a8",
+  }
+  });
 
-// @Get auth/forgotPassword
+// @Get reset/forgotPassword
 router.get('/forgotPassword', (req, res) => {
-  res.send('Send me yout email')
+  res.send('Send me your email')
 })
 
-// @Post auth/forgotPassword
+// @Post reset/forgotPassword
 router.post('/forgotPassword', async (req, res) => {
   const {email} = req.body;
   try {
@@ -39,15 +42,25 @@ router.post('/forgotPassword', async (req, res) => {
     to: user.email,
     from: 'no-reply@blog.com',
     subject: 'Password Reset',
-    text: `
-      Bhosdk Neeche diye gaye link ko follow karo aur apna password reset karo, Bhuje.
-      http://localhost:3000/resetPassword/${token}
+    html: `
+      <p>Bhosdk Neeche diye gaye link ko follow karo aur apna password reset karo, Bhuje.</p>
+      <h4>click in this <a href='http://localhost:3000/resetPassword/${token}'>link</a> to reset Password</h4>
     `,
   };
   // send e-mail to user
-  await transport.sendMail(EmailToUser);
+  // await transport.sendMail(EmailToUser);
 
-  res.status(200).json({message: `An e-mail has been sent to ${email} with further instructions.`})
+  transport.sendMail(EmailToUser, (err, info) => {
+    if(err){
+        console.log('Error -> ',err);
+    }
+    else{
+    console.log("Information ", info);
+    res.status(200).json({message: `An e-mail has been sent to ${email} with further instructions.`})
+    }
+  });
+
+  // res.status(200).json({message: `An e-mail has been sent to ${email} with further instructions.`})
   
 
   } catch (err) {
@@ -57,13 +70,13 @@ router.post('/forgotPassword', async (req, res) => {
 
 })
 
-// @Get auth/resetPassword
+// @Get reset/resetPassword
 router.get('/resetPassword', (req, res) => {
   res.send('reset password')
 })
 
-// @Post auth/resetPassword
-router.post('/resetPassword/:token', async (req, res) => {
+// @Post reset/resetPassword
+router.post('/resetPassword', async (req, res) => {
   const {newPassword, confirmPassword, token} = req.body;
   
   if(newPassword !== confirmPassword){
@@ -77,7 +90,7 @@ router.post('/resetPassword/:token', async (req, res) => {
 
 
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bycrypt.hash(newPassword, salt);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
 
   await User.findOneAndUpdate({email: user.email}, {
     password: hashedPassword,

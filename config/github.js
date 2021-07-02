@@ -1,7 +1,7 @@
 const GithubStrategy = require('passport-github2').Strategy
 const mongoose = require('mongoose')
 // still need to make
-const Users = require('../models/Users')
+const User = require('../models/Login_User');
 
 
 module.exports = function (passport) {
@@ -10,26 +10,28 @@ module.exports = function (passport) {
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        scope: ['user:email'],
         callbackURL: '/auth/github/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
       
         const newUser = {
-          githubId: profile.id,
           firstName: profile.displayName,
+          lastName: profile.lastName,
           image: profile.photos[0].value,
-          email: profile.email,
+          email: profile.emails[0].value,
         }
-
+        console.log('emailssss ', profile.emails.value)
+        console.log('emailssss ', profile.emails[0].value)
         console.log('profile->>', profile)
         
         try {
-          let user = await Users.findOne({ githubId: profile.id }) 
+          let user = await User.findOne({ email: profile.emails[0].value}) 
 
           if (user) {
             done(null, user)
           } else {
-            user = await Users.create(newUser)
+            user = await User.create(newUser)
             done(null, user)
           }
         } catch (err) {
@@ -47,6 +49,6 @@ module.exports = function (passport) {
 
   // Passport figures out the user has already been authenticated and directs the server to send the requested posts to the user's browser.
   passport.deserializeUser((id, done) => {
-    Users.findById(id, (err, user) => done(null, user)) //  retrieve the whole object from session
+    User.findById(id, (err, user) => done(null, user)) //  retrieve the whole object from session
   })
  }

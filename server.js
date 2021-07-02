@@ -1,7 +1,6 @@
 const path = require('path')
 const express = require('express')
 const cors = require('cors')
-
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
@@ -12,13 +11,14 @@ const cookieParser = require('cookie-parser')
 const MongoStore = require('connect-mongo')
 
 const app = express();
-app.disable('x-powered-by');
+// app.disable('x-powered-by');
 
 dotenv.config({path: './config/dot.env'});
 
 // instinct of passport for entire server
 require('./config/google')(passport)
 require('./config/login')(passport)
+require('./config/github')(passport)
 
 ConnectDB();
 
@@ -39,7 +39,7 @@ app.use(
   session({
     cookie:{
       secure: true,
-      maxAge: 60000
+      maxAge: 24*60*60*1000
          },
     secret: process.env.SECRET,
     resave: true,
@@ -63,8 +63,9 @@ app.use(passport.session());
 
 
 
-app.use('/auth', require('./routes/Reset_Password'))
+app.use('/reset', require('./routes/Reset_Password'))
 app.use('/user', require('./routes/Login_User'))
+app.use('/auth', require('./routes/Google_User'));
 
 const PORT = process.env.PORT || 4444
 app.listen(PORT, () => {
