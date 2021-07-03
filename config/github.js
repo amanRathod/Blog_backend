@@ -16,8 +16,7 @@ module.exports = function (passport) {
       async (accessToken, refreshToken, profile, done) => {
       
         const newUser = {
-          firstName: profile.displayName,
-          lastName: profile.lastName,
+          fullName: profile.displayName ,
           image: profile.photos[0].value,
           email: profile.emails[0].value,
         }

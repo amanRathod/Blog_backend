@@ -7,14 +7,18 @@ const nodemailer = require('nodemailer');
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 const User = require('../models/Login_User')
 
-const transport = nodemailer.createTransport({
-  host: "smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: "44240336e52ed7",
-    pass: "b8876322f864a8",
-  }
-  });
+// const transport = nodemailer.createTransport({
+//   host: "smtp.mailtrap.io",
+//   port: 2525,
+//   auth: {
+//     user: "44240336e52ed7",
+//     pass: "b8876322f864a8",
+//   }
+//   });
+
+const transport = nodemailer.createTransport(nodemailerSendgrid({
+  apiKey: process.env.SENDGRID_API_KEY,
+}));
 
 // @Get reset/forgotPassword
 router.get('/forgotPassword', (req, res) => {
@@ -33,18 +37,21 @@ router.post('/forgotPassword', async (req, res) => {
 
       // create token and convert token-hexadecimal to string
   const token  = await crypto.randomBytes(32).toString('hex');
+  
   // save token into user Database
   user.resetToken = token,
   user.expireToken = Date.now() + 30*60*1000 // 30 min
-  user.save();
+  user.save()
 
+  console.log('reset token',user.resetToken)
   const EmailToUser = {
     to: user.email,
-    from: 'no-reply@blog.com',
+    from: 'bittu90670@gmail.com',
     subject: 'Password Reset',
     html: `
-      <p>Bhosdk Neeche diye gaye link ko follow karo aur apna password reset karo, Bhuje.</p>
-      <h4>click in this <a href='http://localhost:3000/resetPassword/${token}'>link</a> to reset Password</h4>
+      <h5> You are receiving this because you (or someone else) have requested the reset of the password for your account..</h5>
+      <p>Please click on this <a href='http://localhost:3000/resetPassword/${token}'>link</a> to reset Password</p>
+      <h5>If you did not request this, please ignore this email and your password will remain unchanged.</h5>
     `,
   };
   // send e-mail to user
@@ -78,7 +85,7 @@ router.get('/resetPassword', (req, res) => {
 // @Post reset/resetPassword
 router.post('/resetPassword', async (req, res) => {
   const {newPassword, confirmPassword, token} = req.body;
-  
+  try{
   if(newPassword !== confirmPassword){
     res.status(302).json({message: "Password doesn't Match"})
   }
@@ -87,7 +94,7 @@ router.post('/resetPassword', async (req, res) => {
   if(!user){
     res.status(302).json({message: "Try again session expired"});
   }
-
+  console.log('user', user.username);
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(newPassword, salt);
@@ -109,7 +116,10 @@ router.post('/resetPassword', async (req, res) => {
 
   await transport.sendMail(resetEmail);
   res.status(200).json({message: 'Your password has been changed successfully'})
-
+  }
+  catch (err) {
+    console.error(err);
+  }
 });
 
 module.exports = router

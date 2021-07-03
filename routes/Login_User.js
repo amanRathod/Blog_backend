@@ -9,7 +9,7 @@ const User = require('../models/Login_User');
 router.post('/register',  async (req, res) => {
 
 
-  const { firstName, lastName, email, password, confirmPassword } = req.body;
+  const { fullName, username, email, password, confirmPassword } = req.body;
   let error = {};
 
   
@@ -20,6 +20,13 @@ router.post('/register',  async (req, res) => {
   //   return res.status(203).json( { error } );
   // }
 
+  const usernameExists = await User.findOne({username: username});
+  if(usernameExists){
+    error.username = 'This Username is taken';
+  }
+  if(Object.keys(error).length > 0 ){
+    return res.status(203).json( { error } );
+  }
 
   if(password.length < 6 ){
     error.password =  'Password must be atleast six character' ;
@@ -50,8 +57,8 @@ router.post('/register',  async (req, res) => {
 
   try{
     const savedUser = await User.create({
-      firstName,
-      lastName,
+      fullName,
+      username,
       email,
       password: hashedPassword,
     })

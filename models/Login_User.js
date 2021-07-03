@@ -46,11 +46,11 @@ const posts = require('./Post');
 // })
 
 const UserSchema =  new mongoose.Schema({
-  firstName: {
+  fullName: {
     type: String,
     required: true,
   },
-  lastName: {
+  username: {
     type: String,
     // required: true
   },

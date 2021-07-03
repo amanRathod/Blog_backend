@@ -15,20 +15,19 @@ module.exports = function (passport) {
         console.log('Email -> ', profile.emails[0].value)
         
         const newUser = {
-          firstName: profile.name.givenName,
-          lastName: profile.name.familyName,
+          fullName: profile.name.givenName + profile.name.familyName,
           email: profile.emails[0].value,
-          image: profile.photos[0].value
+          image: profile.photos[0].value,
         }
-
-        let user =  await User.findOne({email: profile.emails[0].value});
-
         try{
+          let user =  await User.findOne({email: profile.emails[0].value});
           if(user){
-            return done(null, user)
+            console.log("user exists")
+            done(null, user)
           }
           else {
-            user = User.create(newUser);
+            user = await User.create(newUser);
+            console.log('User created', user)
             done(null, user)
           }
         }

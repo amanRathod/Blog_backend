@@ -25,14 +25,22 @@ ConnectDB();
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
+// app.use(cors());
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
 }))
+app.use(morgan('dev'))
 
-// logging
 
-  app.use(morgan('dev'))
+app.use( (req, res, next) => {  
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PATCH'); 
+  res.header('Access-Control-Allow-Headers', '*');  
+  res.header('Access-Control-Allow-Credentials', true);  
+  next();
+});
+
 
 // app.set('trust proxy', 1); // // trust first proxy
 app.use(
@@ -49,19 +57,11 @@ app.use(
   })
   })
 );
-app.use(function(req,res,next){
-  if(!req.session){
-      return next(new Error('Oh no')) //handle error
-  }
-  next() //otherwise continue
-  });
 
 // Passport middleware
 app.use(cookieParser('secretcode'));
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 app.use('/reset', require('./routes/Reset_Password'))
 app.use('/user', require('./routes/Login_User'))
