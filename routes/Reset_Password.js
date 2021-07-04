@@ -7,18 +7,18 @@ const nodemailer = require('nodemailer');
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 const User = require('../models/Login_User')
 
-// const transport = nodemailer.createTransport({
-//   host: "smtp.mailtrap.io",
-//   port: 2525,
-//   auth: {
-//     user: "44240336e52ed7",
-//     pass: "b8876322f864a8",
-//   }
-//   });
+const transport = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "44240336e52ed7",
+    pass: "b8876322f864a8",
+  }
+  });
 
-const transport = nodemailer.createTransport(nodemailerSendgrid({
-  apiKey: process.env.SENDGRID_API_KEY,
-}));
+// const transport = nodemailer.createTransport(nodemailerSendgrid({
+//   apiKey: process.env.SENDGRID_API_KEY,
+// }));
 
 // @Get reset/forgotPassword
 router.get('/forgotPassword', (req, res) => {

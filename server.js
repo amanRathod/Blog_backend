@@ -66,6 +66,7 @@ app.use(passport.session());
 app.use('/reset', require('./routes/Reset_Password'))
 app.use('/user', require('./routes/Login_User'))
 app.use('/auth', require('./routes/Google_User'));
+app.use('/getData', require('./routes/SendDataToClient'))
 
 const PORT = process.env.PORT || 4444
 app.listen(PORT, () => {
