@@ -65,10 +65,6 @@ const UserSchema =  new mongoose.Schema({
   image: {
     type: String,
   },
-  posts: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: posts,
-  },
   followers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
@@ -97,6 +93,10 @@ const UserSchema =  new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  }
 
 })
 
