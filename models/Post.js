@@ -28,16 +28,12 @@ const PostSchema = new mongoose.Schema({
     }
   }],
   userId: {
-    type: Number,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   },
   likes: [{
     type: Number,
   }],
-  userId: {
-    type: String,
-    required: true,
-  },
   category: {
     type: String,
     required: true,

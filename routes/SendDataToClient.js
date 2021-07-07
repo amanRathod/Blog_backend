@@ -6,8 +6,9 @@ const Posts = require('../models/Post');
 
 
 router.get('/userId/:id', async (req, res, next) => {
-    const id  = req.params.id;
+    const id  = (req.params.id);
     let data = [];
+    console.log('sdfd', id)
 
     try{
         let store = '';
@@ -62,17 +63,28 @@ router.get('/singleId/:id', async (req, res) => {
 router.get('/postsById/:id', async (req, res) => {
     const id = req.params.id;
     try {
+        
         Posts.find({}, function(err, posts) {
             let hashMap = {};
-
             posts.forEach(function(post) {
-                if ( post.userId === id ){
+                if ( String(post.userId) === String(id) ){
                     hashMap[post._id] = post;
                 }
             })
             res.status(200).send(hashMap);
         })
         
+        
+    } catch (err) {
+        console.error(err);
+    }
+})
+
+router.get('/UserByUsername/:username', async (req, res) => {
+    try {
+        const username = req.params.username;
+        const data = await User.findOne({username: username});
+        res.send(data);
     } catch (err) {
         console.error(err);
     }
