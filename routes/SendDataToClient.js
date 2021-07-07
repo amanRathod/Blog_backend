@@ -34,17 +34,47 @@ router.get('/allPosts', async (req, res) => {
 
     try {
         Posts.find({}, function(err, posts) {
-            const postsMap = {};
+            let postsMap = {};
 
             posts.forEach(function(post) {
                 postsMap[post._id] = post;
             })
-            console.log(postsMap);
-            res.send(postMap);
+            res.status(200).json(postsMap);
 
         })
+        // res.status.json(postsMap);
     } catch(err) {
         console.error('errr', err.message);
+    }
+})
+
+router.get('/singleId/:id', async (req, res) => {
+    
+    const id = req.params.id;
+    try{
+        const data = await User.find({_id: id})
+        res.status(200).json(data[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+})
+
+router.get('/postsById/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        Posts.find({}, function(err, posts) {
+            let hashMap = {};
+
+            posts.forEach(function(post) {
+                if ( post.userId === id ){
+                    hashMap[post._id] = post;
+                }
+            })
+            res.status(200).send(hashMap);
+        })
+        
+    } catch (err) {
+        console.error(err);
     }
 })
 
