@@ -157,7 +157,6 @@ router.put('/changeFollower', async (req, res) => {
                 }
             }
         }
-        const userss = await User.findById({_id: profileId})
         res.status(200).json({loggedIn: user1, profile: user2});
         
     } catch (err) {
@@ -170,10 +169,26 @@ router.put('/updateBio', async (req, res) => {
     const id = req.query.id;
     try {
         const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
-        console.log('bioo', data);
         res.status(200).json({bio: bio});
     } catch (err) {
         console.error(err)
+    }
+})
+
+router.post('/postComment', async (req, res) => {
+    const blogId = req.query.blogId;
+    const comment = req.query.comment;
+    
+    const loggedInUserId = req.query.loggedInUserId;
+    
+    try {
+        const posts = await Posts.findOne({_id: blogId });
+        posts.comments.push({comment, loggedInUserId });
+        posts.save();
+        res.status(200).json({posts});
+
+    } catch (err) {
+        console.error(err);
     }
 })
 
