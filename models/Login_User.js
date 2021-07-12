@@ -96,6 +96,10 @@ const UserSchema =  new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now,
+  },
+  bio: {
+    type: String,
+    default: '',
   }
 
 })

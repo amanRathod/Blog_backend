@@ -23,8 +23,9 @@ const PostSchema = new mongoose.Schema({
     comment: {
       type: String,
     },
-    fullName: {
-      type: String,
+    usersId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     }
   }],
   userId: {

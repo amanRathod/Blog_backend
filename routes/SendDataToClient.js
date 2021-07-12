@@ -165,4 +165,16 @@ router.put('/changeFollower', async (req, res) => {
     }
 })
 
+router.put('/updateBio', async (req, res) => {
+    const bio = req.query.bio;
+    const id = req.query.id;
+    try {
+        const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
+        console.log('bioo', data);
+        res.status(200).json({bio: bio});
+    } catch (err) {
+        console.error(err)
+    }
+})
+
 module.exports = router;
