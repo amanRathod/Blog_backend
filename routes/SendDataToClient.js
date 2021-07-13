@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router();
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
+const { findOne } = require('../models/Post');
 
 router.get('/userId/:id', async (req, res, next) => {
     const id  = (req.params.id);
@@ -211,6 +212,23 @@ router.post('/addLikesId', async (req, res) => {
         res.status(200).json(data.likes);
     } catch (err) {
         console.error(err);
+    }
+})
+
+router.post('/addLikesforComments', async (req, res) => {
+    const userId = req.query.userId;
+    const blogId = req.query.blogId;
+    try {
+        const posts = await Posts.findOne({_id: blogId});
+        if(!posts.comments.likes.includes(userId)) {
+            posts.comments.likes.push(userId)
+            console.log('pos', posts);
+            posts.save();
+            console.log('postss',posts)
+        }
+        res.status(200).json(posts.comments.likes);
+    } catch (err) {
+        console.error(err)
     }
 })
 
