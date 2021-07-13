@@ -115,8 +115,6 @@ router.put('/changeFollower', async (req, res) => {
     const loggedId = req.query.loggedInUsername;
     const profileId = req.query.profileUsername;
     const toggleValue = req.query.toggleValue;
-    console.log('logge', loggedId)
-    console.log('profile', profileId)
 
     const user1 = await User.findOne({_id: loggedId});
     const user2 = await User.findOne({_id: profileId})
@@ -142,7 +140,6 @@ router.put('/changeFollower', async (req, res) => {
             
                 if(String(user1.following[i]) === String(profileId)){
                     user1.following.splice(i, 1);
-                    console.log('user1', user1)
                     user1.save();
                     break;
                 }
@@ -151,7 +148,6 @@ router.put('/changeFollower', async (req, res) => {
             for(let i = 0; i< user2.followers.length; ++i) {
                 if(String(user2.followers[i]) === String(loggedId)) {
                     user2.followers.splice(i, 1);
-                    console.log('user2', user2);
                     user2.save();
                     break;
                 }
@@ -187,6 +183,32 @@ router.post('/postComment', async (req, res) => {
         posts.save();
         res.status(200).json({posts});
 
+    } catch (err) {
+        console.error(err);
+    }
+})
+
+
+router.get('/postById/:Id', async (req, res) => {
+    const PostId = req.params.Id;
+    try {
+        const data = await Posts.findOne({_id: PostId});
+        res.status(200).json(data);
+    } catch (err) {
+        console.error(err);
+    }
+})
+
+router.post('/addLikesId', async (req, res) => {
+    const UserId = req.query.userId;
+    const blogId = req.query.blogId;
+    try {
+        const data = await Posts.findOne({_id: blogId});
+        if(!data.likes.includes(UserId)) {
+            data.likes.push(UserId);
+            data.save();
+        }
+        res.status(200).json(data.likes);
     } catch (err) {
         console.error(err);
     }
