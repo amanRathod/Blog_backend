@@ -112,82 +112,82 @@ router.get('/UserFollow', (req, res) => {
     }
 })
 
-router.put('/changeFollower', async (req, res) => {
-    const loggedId = req.query.loggedInUsername;
-    const profileId = req.query.profileUsername;
-    const toggleValue = req.query.toggleValue;
+// router.put('/changeFollower', async (req, res) => {
+//     const loggedId = req.query.loggedInUsername;
+//     const profileId = req.query.profileUsername;
+//     const toggleValue = req.query.toggleValue;
 
-    const user1 = await User.findOne({_id: loggedId});
-    const user2 = await User.findOne({_id: profileId})
-    //if toggle is true then append the userId else delete
+//     const user1 = await User.findOne({_id: loggedId});
+//     const user2 = await User.findOne({_id: profileId})
+//     //if toggle is true then append the userId else delete
    
-    try {
-        if(toggleValue === 'true'){
+//     try {
+//         if(toggleValue === 'true'){
             
-            if(!user1.following.includes(profileId)){
+//             if(!user1.following.includes(profileId)){
                 
-                user1.following.push(profileId);
-                user1.save()
+//                 user1.following.push(profileId);
+//                 user1.save()
 
-            }
-            if(!user2.followers.includes(loggedId)){
+//             }
+//             if(!user2.followers.includes(loggedId)){
                 
-                user2.followers.push(loggedId);
-                user2.save();
-            }
+//                 user2.followers.push(loggedId);
+//                 user2.save();
+//             }
 
-        }else {
-            for(let i = 0; i< user1.following.length; ++i) {
+//         }else {
+//             for(let i = 0; i< user1.following.length; ++i) {
             
-                if(String(user1.following[i]) === String(profileId)){
-                    user1.following.splice(i, 1);
-                    user1.save();
-                    break;
-                }
-            }
+//                 if(String(user1.following[i]) === String(profileId)){
+//                     user1.following.splice(i, 1);
+//                     user1.save();
+//                     break;
+//                 }
+//             }
 
-            for(let i = 0; i< user2.followers.length; ++i) {
-                if(String(user2.followers[i]) === String(loggedId)) {
-                    user2.followers.splice(i, 1);
-                    user2.save();
-                    break;
-                }
-            }
-        }
-        res.status(200).json({loggedIn: user1, profile: user2});
+//             for(let i = 0; i< user2.followers.length; ++i) {
+//                 if(String(user2.followers[i]) === String(loggedId)) {
+//                     user2.followers.splice(i, 1);
+//                     user2.save();
+//                     break;
+//                 }
+//             }
+//         }
+//         res.status(200).json({loggedIn: user1, profile: user2});
         
-    } catch (err) {
-        console.error(err);
-    }
-})
+//     } catch (err) {
+//         console.error(err);
+//     }
+// })
 
-router.put('/updateBio', async (req, res) => {
-    const bio = req.query.bio;
-    const id = req.query.id;
-    try {
-        const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
-        res.status(200).json({bio: bio});
-    } catch (err) {
-        console.error(err)
-    }
-})
+// router.put('/updateBio', async (req, res) => {
+//     const bio = req.query.bio;
+//     const id = req.query.id;
+//     try {
+//         const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
+//         res.status(200).json({bio: bio});
+//     } catch (err) {
+//         console.error(err)
+//     }
+// })
 
-router.post('/postComment', async (req, res) => {
-    const blogId = req.query.blogId;
-    const comment = req.query.comment;
+// router.post('/postComment', async (req, res) => {
+//     const blogId = req.query.blogId;
+//     const comment = req.query.comment;
     
-    const loggedInUserId = req.query.loggedInUserId;
+//     const loggedInUserId = req.query.loggedInUserId;
     
-    try {
-        const posts = await Posts.findOne({_id: blogId });
-        posts.comments.push({comment, loggedInUserId });
-        posts.save();
-        res.status(200).json({posts});
+//     try {
+//         const posts = await Posts.findOne({_id: blogId });
+//         posts.comments.push({comment, loggedInUserId });
+//         posts.save();
+//         res.status(200).json({posts});
 
-    } catch (err) {
-        console.error(err);
-    }
-})
+//     } catch (err) {
+//         console.error(err);
+//     }
+// })
 
 
 router.get('/postById/:Id', async (req, res) => {
@@ -200,36 +200,36 @@ router.get('/postById/:Id', async (req, res) => {
     }
 })
 
-router.post('/addLikesId', async (req, res) => {
-    const UserId = req.query.userId;
-    const blogId = req.query.blogId;
-    try {
-        const data = await Posts.findOne({_id: blogId});
-        if(!data.likes.includes(UserId)) {
-            data.likes.push(UserId);
-            data.save();
-        }
-        res.status(200).json(data.likes);
-    } catch (err) {
-        console.error(err);
-    }
-})
+// router.post('/addLikesId', async (req, res) => {
+//     const UserId = req.query.userId;
+//     const blogId = req.query.blogId;
+//     try {
+//         const data = await Posts.findOne({_id: blogId});
+//         if(!data.likes.includes(UserId)) {
+//             data.likes.push(UserId);
+//             data.save();
+//         }
+//         res.status(200).json(data.likes);
+//     } catch (err) {
+//         console.error(err);
+//     }
+// })
 
-router.post('/addLikesforComments', async (req, res) => {
-    const userId = req.query.userId;
-    const blogId = req.query.blogId;
-    try {
-        const posts = await Posts.findOne({_id: blogId});
-        if(!posts.comments.likes.includes(userId)) {
-            posts.comments.likes.push(userId)
-            console.log('pos', posts);
-            posts.save();
-            console.log('postss',posts)
-        }
-        res.status(200).json(posts.comments.likes);
-    } catch (err) {
-        console.error(err)
-    }
-})
+// router.post('/addLikesforComments', async (req, res) => {
+//     const userId = req.query.userId;
+//     const blogId = req.query.blogId;
+//     try {
+//         const posts = await Posts.findOne({_id: blogId});
+//         if(!posts.comments.likes.includes(userId)) {
+//             posts.comments.likes.push(userId)
+//             console.log('pos', posts);
+//             posts.save();
+//             console.log('postss',posts)
+//         }
+//         res.status(200).json(posts.comments.likes);
+//     } catch (err) {
+//         console.error(err)
+//     }
+// })
 
 module.exports = router;

@@ -67,6 +67,9 @@ app.use('/reset', require('./routes/Reset_Password'))
 app.use('/user', require('./routes/Login_User'))
 app.use('/auth', require('./routes/Google_User'));
 app.use('/getData', require('./routes/SendDataToClient'))
+app.use('/postData', require('./routes/post_toClient'))
+app.use('/putData', require('./routes/put_toClient'))
+// app.use('/deleteData', require('./routes/delete_toClient'))
 
 const PORT = process.env.PORT || 4444
 app.listen(PORT, () => {
