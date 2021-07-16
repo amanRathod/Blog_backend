@@ -14,9 +14,11 @@ const PostSchema = new mongoose.Schema({
   status: {
     type: String,
     default: 'public',
-    enum: ['public', 'private'],
   },
   photo: {
+    type: String,
+  },
+  tags: {
     type: String,
   },
   comments: [{

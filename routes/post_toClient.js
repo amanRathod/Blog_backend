@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router();
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
+const Post = require('../models/Post');
 
 
 router.post('/addLikesId', async (req, res) => {
@@ -58,6 +59,23 @@ router.post('/postComment', async (req, res) => {
 
   } catch (err) {
       console.error(err);
+  }
+})
+
+router.post('/addblog', async (req, res) => {
+  const {title, content, userId, tags, status, category} = req.body;
+  try {
+    const saveBlog = await Post.create({
+      title,
+      content,
+      category,
+      userId,
+      tags,
+      status,      
+    });
+    res.status(200).status(saveBlog);
+  } catch (err) {
+    console.error(err);
   }
 })
 
