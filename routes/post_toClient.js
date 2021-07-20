@@ -25,20 +25,21 @@ router.post('/addLikesforComments', async (req, res) => {
   const userId = req.query.userId;
   const blogId = req.query.blogId;
   const commentId = req.query.commentId;
+  const liketoggle = req.query.liketoggle;
   try {
-      const posts = await Posts.findOne({_id: blogId});
-    console.log('poo', posts.comments)
-      for(let i = 0; i< posts.comments.length; ++i) {
-          if(String(posts.comments[i]._id) === String(commentId)){
-              if(!posts.comments[i].likes.includes(userId)){
-                  posts.comments[i].likes.push(userId);
-                  posts.save();
-                res.status(200).json(posts.comments);
-              }
-          }
-      }
-      res.status(302).send('user already liked')
-      
+    const posts = await Posts.findOne({_id: blogId});
+  console.log('poo', posts.comments)
+    for(let i = 0; i< posts.comments.length; ++i) {
+        if(String(posts.comments[i]._id) === String(commentId)){
+            if(!posts.comments[i].likes.includes(userId)){
+                posts.comments[i].likes.push(userId);
+                posts.save();
+              res.status(200).json(posts.comments);
+            }
+        }
+    }
+    res.status(302).send('user already liked')
+    
       
   } catch (err) {
       console.error(err)
@@ -73,10 +74,47 @@ router.post('/addblog', async (req, res) => {
       tags,
       status,      
     });
-    res.status(200).status(saveBlog);
+    res.status(200).send(saveBlog);
   } catch (err) {
     console.error(err);
   }
 })
 
 module.exports = router;
+
+
+
+// try {
+//   const posts = await Posts.findOne({_id: blogId});
+//   if(liketoggle === 'true') {
+
+//     for(let i = 0; i< posts.comments.length; ++i) {
+//         if(String(posts.comments[i]._id) === String(commentId)){
+//             if(!posts.comments[i].likes.includes(userId)){
+//                 posts.comments[i].likes.push(userId);
+//                 posts.save();
+//                 console.log('postsss', posts);
+//                 console.log('yes-1')
+//                 break;
+//             }
+//         }
+//     }
+    
+//   }
+//   else {
+//     for(let i = 0; i< posts.comments.length; ++i) {
+//       if(String(posts.comments[i]._id) === String(commentId)){
+//           console.log('yesss')
+//         for(let j = 0; j< posts.comments[i].likes.length; ++j) {
+//           console.log('yessssssss')
+//           if(posts.comments[i].likes[j] === userId){
+//             posts.comments[i].likes.splice(j, 1);
+          
+//           posts.save();
+//           console.log('postss', posts.comments[i].likes)
+//           console.log('yes-2')
+//           break;
+//           }            
+//         }
+//       }
+//     }

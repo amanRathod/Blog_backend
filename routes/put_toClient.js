@@ -66,4 +66,19 @@ router.put('/updateBio', async (req, res) => {
   }
 })
 
+router.put('/saveBlog', async (req, res) => {
+    const {title, category, status, tags, blogData} = req.body
+    try {
+        const post = await Posts.findOneAndUpdate({_id: blogData._id}, {
+            title,
+            category,
+            status,
+            tags,   
+        })
+        res.status(200).json({post})
+    } catch (err) {
+        console.log(err);
+    }
+})
+
 module.exports = router;
