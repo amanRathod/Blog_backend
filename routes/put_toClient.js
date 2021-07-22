@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 const express = require('express')
+const multer = require('multer');
 const router = express.Router();
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
-
+const app = express();
 
 router.put('/changeFollower', async (req, res) => {
   const loggedId = req.query.loggedInUsername;
@@ -67,18 +68,60 @@ router.put('/updateBio', async (req, res) => {
 })
 
 router.put('/saveBlog', async (req, res) => {
-    const {title, category, status, tags, blogData} = req.body
+    const {title, category, status, tags, blogData, content} = req.body
     try {
-        const post = await Posts.findOneAndUpdate({_id: blogData._id}, {
+        const post = await Posts.findOneAndUpdate({_id: blogData._id}, { 
             title,
             category,
             status,
             tags,   
+            content,
         })
         res.status(200).json({post})
     } catch (err) {
         console.log(err);
     }
 })
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+    cb(null, './public')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+const upload = multer({storage: storage}).single('file');
+app.use(express.static(__dirname + '/public'));
+app.use('/public', express.static('public'));
+
+
+router.put('/updateProfile', async (req, res) => {
+
+    upload(req,res, (err) => {
+        console.log(req.file);
+        console.log(req.body);
+        // const path = req.file.path.split('/');
+        // const avatarUrl = `http://localhost:3000/images/${path[1]}`;
+        const { fullName, bio,  username} = req.body;
+        if(!err) {
+            return User.findOneAndUpdate({username, username}, {
+                fullName,
+                bio,
+                // image: avatarUrl
+                
+            }, (err, user) => {
+                if(!err){
+                    return  res.status(200).send('updated successfully at => ')
+                }
+                return res.status(500).json(err)
+            });
+                   
+        } 
+        return res.status(500).json(err)
+    })
+});
+
 
 module.exports = router;
