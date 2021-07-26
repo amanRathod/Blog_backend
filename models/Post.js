@@ -17,10 +17,16 @@ const PostSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
+    required: true
   },
-  tags: {
-    type: String,
-  },
+  tags: [{
+    id: {
+      type: String,
+    },
+    text: {
+      type: String,
+    }
+  }],
   comments: [{
     comment: {
       type: String,
@@ -51,10 +57,6 @@ const PostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }],
-  category: {
-    type: String,
-    required: true,
-  },
   createdAt: {
     type: Date,
     default: Date.now,

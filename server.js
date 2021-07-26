@@ -63,6 +63,8 @@ app.use(cookieParser('secretcode'));
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/public',express.static('public'));
+
 app.use('/reset', require('./routes/Reset_Password'))
 app.use('/user', require('./routes/Login_User'))
 app.use('/auth', require('./routes/Google_User'));

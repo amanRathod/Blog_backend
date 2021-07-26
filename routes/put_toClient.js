@@ -4,7 +4,7 @@ const multer = require('multer');
 const router = express.Router();
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
-const app = express();
+const path = require('path');
 
 router.put('/changeFollower', async (req, res) => {
   const loggedId = req.query.loggedInUsername;
@@ -56,71 +56,81 @@ router.put('/changeFollower', async (req, res) => {
 })
 
 
-router.put('/updateBio', async (req, res) => {
-  const bio = req.query.bio;
-  const id = req.query.id;
-  try {
-      const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
-      res.status(200).json({bio: bio});
-  } catch (err) {
-      console.error(err)
-  }
-})
-
-router.put('/saveBlog', async (req, res) => {
-    const {title, category, status, tags, blogData, content} = req.body
-    try {
-        const post = await Posts.findOneAndUpdate({_id: blogData._id}, { 
-            title,
-            category,
-            status,
-            tags,   
-            content,
-        })
-        res.status(200).json({post})
-    } catch (err) {
-        console.log(err);
+// router.put('/updateBio', async (req, res) => {
+//   const bio = req.query.bio;
+//   const id = req.query.id;
+//   try {
+//       const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
+//       res.status(200).json({bio: bio});
+//   } catch (err) {
+//       console.error(err)
+//   }
+// })
+const storage1 = multer.diskStorage({
+    destination: "./public/coverPhoto/",
+    filename: function(req, file, cb){
+       cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
     }
-})
+});
+
+const coverUpload = multer({storage: storage1, limits:{fileSize: 100000000}})
+
+// router.use('/public', express.static('public'));
+
+router.put('/saveBlog', coverUpload.single('file'), async (req, res) => {
+    try {
+        const {title, status, tags, blogId, content, file} = req.body
+        const tag = JSON.parse(tags);
+        let coverPhoto;
+        if (req.file) {
+            coverPhoto = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+        }
+        else {
+            coverPhoto = file;
+        }
+        const saveBlog = await Posts.findOneAndUpdate({_id: blogId}, { 
+                title,
+                status,
+                tags: tag,
+                content,
+                photo: coverPhoto,
+            });
+        res.status(200).json({blog: saveBlog});
+                   
+    } catch (err) {
+        console.error(err)
+        res.status(500).json(err)
+    }
+});
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-    cb(null, './public')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
-  }
-})
+    destination: "./public/uploads/",
+    filename: function(req, file, cb){
+       cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
+    }
+});
 
-const upload = multer({storage: storage}).single('file');
-app.use(express.static(__dirname + '/public'));
-app.use('/public', express.static('public'));
+const upload = multer({storage: storage, limits:{fileSize: 30000000}})
 
 
-router.put('/updateProfile', async (req, res) => {
-
-    upload(req,res, (err) => {
+router.put('/updateProfile', upload.single('file'), async (req, res) => {
+    
         console.log(req.file);
         console.log(req.body);
-        // const path = req.file.path.split('/');
-        // const avatarUrl = `http://localhost:3000/images/${path[1]}`;
+        const avatarUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path;
         const { fullName, bio,  username} = req.body;
-        if(!err) {
-            return User.findOneAndUpdate({username, username}, {
+        try {
+            const data = await User.findOneAndUpdate({username, username}, {
                 fullName,
                 bio,
-                // image: avatarUrl
-                
-            }, (err, user) => {
-                if(!err){
-                    return  res.status(200).send('updated successfully at => ')
-                }
-                return res.status(500).json(err)
+                image: avatarUrl
             });
-                   
-        } 
-        return res.status(500).json(err)
-    })
+            res.status(200).json(data);
+        
+        } catch (err) {
+            console.error(err)
+            res.sendStatus(500);
+        }
 });
 
 

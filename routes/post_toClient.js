@@ -1,10 +1,12 @@
 const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router();
+const  multer =  require('multer')
+const path = require('path');
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
 const Post = require('../models/Post');
-
+const { diskStorage } = require('multer');
 
 router.post('/addLikesId', async (req, res) => {
   const UserId = req.query.userId;
@@ -63,13 +65,40 @@ router.post('/postComment', async (req, res) => {
   }
 })
 
-router.post('/addblog', async (req, res) => {
-  const {title, content, userId, tags, status, category} = req.body;
+const storage = multer.diskStorage({
+  destination: './public/coverPhoto',
+  filename: (req, file, cb) => {
+    cb(null, 'IMAGE-' + Date.now() + path.extname(file.originalname));
+  }
+
+})
+
+const upload = multer({ storage: storage, filesize: 100000000 })
+
+router.post('/addblog', upload.single('file'), async (req, res) => {
+  try {  
+    const {title, content, userId, tags, status} = req.body;
+    const photoURL = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+    const blog = await Posts.create({
+      title,
+      content,
+      userId,
+     
+      status,
+      photo: photoURL,
+    })
+    blog.save();
+    res.status(200).json({blog});
+  } catch (err) {
+    console.error(err)
+    req.status(500).json({error: err})
+  }
+  console.log(req.file);
+  
   try {
     const saveBlog = await Post.create({
       title,
       content,
-      category,
       userId,
       tags,
       status,      
