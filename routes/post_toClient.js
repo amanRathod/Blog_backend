@@ -77,13 +77,20 @@ const upload = multer({ storage: storage, filesize: 100000000 })
 
 router.post('/addblog', upload.single('file'), async (req, res) => {
   try {  
-    const {title, content, userId, tags, status} = req.body;
-    const photoURL = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+    const {title, content, userId, tags, status, file} = req.body;
+    let photoURL = '';
+    const tag = JSON.parse(tags);
+    if (req.file) {
+      photoURL = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+    } else {
+      photoURL = file;
+    }
+    
     const blog = await Posts.create({
       title,
       content,
       userId,
-     
+      tags: tag,
       status,
       photo: photoURL,
     })
@@ -93,57 +100,6 @@ router.post('/addblog', upload.single('file'), async (req, res) => {
     console.error(err)
     req.status(500).json({error: err})
   }
-  console.log(req.file);
-  
-  try {
-    const saveBlog = await Post.create({
-      title,
-      content,
-      userId,
-      tags,
-      status,      
-    });
-    res.status(200).send(saveBlog);
-  } catch (err) {
-    console.error(err);
-  }
 })
 
 module.exports = router;
-
-
-
-// try {
-//   const posts = await Posts.findOne({_id: blogId});
-//   if(liketoggle === 'true') {
-
-//     for(let i = 0; i< posts.comments.length; ++i) {
-//         if(String(posts.comments[i]._id) === String(commentId)){
-//             if(!posts.comments[i].likes.includes(userId)){
-//                 posts.comments[i].likes.push(userId);
-//                 posts.save();
-//                 console.log('postsss', posts);
-//                 console.log('yes-1')
-//                 break;
-//             }
-//         }
-//     }
-    
-//   }
-//   else {
-//     for(let i = 0; i< posts.comments.length; ++i) {
-//       if(String(posts.comments[i]._id) === String(commentId)){
-//           console.log('yesss')
-//         for(let j = 0; j< posts.comments[i].likes.length; ++j) {
-//           console.log('yessssssss')
-//           if(posts.comments[i].likes[j] === userId){
-//             posts.comments[i].likes.splice(j, 1);
-          
-//           posts.save();
-//           console.log('postss', posts.comments[i].likes)
-//           console.log('yes-2')
-//           break;
-//           }            
-//         }
-//       }
-//     }

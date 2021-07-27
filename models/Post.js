@@ -17,7 +17,6 @@ const PostSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
-    required: true
   },
   tags: [{
     id: {
