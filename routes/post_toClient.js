@@ -5,42 +5,39 @@ const  multer =  require('multer')
 const path = require('path');
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
-const Post = require('../models/Post');
-const { diskStorage } = require('multer');
 
 router.post('/addLikesId', async (req, res) => {
-  const UserId = req.query.userId;
+  const loggedUsername = req.query.loggedUsername;
   const blogId = req.query.blogId;
   try {
-      const data = await Posts.findOne({_id: blogId});
-      if(!data.likes.includes(UserId)) {
-          data.likes.push(UserId);
-          data.save();
+      const blog = await Posts.findOne({_id: blogId});
+      if(!blog.likes.includes(loggedUsername)) {
+          blog.likes.push(loggedUsername);
+          blog.save();
       }
-      res.status(200).json(data.likes);
+      res.status(200).json(blog.likes);
   } catch (err) {
       console.error(err);
   }
 })
 
-router.post('/addLikesforComments', async (req, res) => {
-  const userId = req.query.userId;
+router.post('/addLikesIntoComments', async (req, res) => {
+  const loggedUsername = req.query.loggedUsername;
   const blogId = req.query.blogId;
   const commentId = req.query.commentId;
-  const liketoggle = req.query.liketoggle;
   try {
     const posts = await Posts.findOne({_id: blogId});
-  console.log('poo', posts.comments)
     for(let i = 0; i< posts.comments.length; ++i) {
         if(String(posts.comments[i]._id) === String(commentId)){
-            if(!posts.comments[i].likes.includes(userId)){
-                posts.comments[i].likes.push(userId);
+            if(!posts.comments[i].likes.includes(loggedUsername)){
+                posts.comments[i].likes.push(loggedUsername);
                 posts.save();
-              res.status(200).json(posts.comments);
+                res.status(200).json(posts.comments);
+                break;
             }
         }
     }
-    res.status(302).send('user already liked')
+    // res.status(302).send('user already liked')
     
       
   } catch (err) {
@@ -50,15 +47,15 @@ router.post('/addLikesforComments', async (req, res) => {
 
 router.post('/postComment', async (req, res) => {
   const blogId = req.query.blogId;
-  const comment = req.query.comment;
-  
-  const loggedInUserId = req.query.loggedInUserId;
+  const comment = req.query.commentContent;
+  const username = req.query.loggedUsername;
+  // const loggedInUserId = req.query.loggedInUserId;
   
   try {
-      const posts = await Posts.findOne({_id: blogId });
-      posts.comments.push({comment, loggedInUserId });
-      posts.save();
-      res.status(200).json({posts});
+      const blog = await Posts.findOne({_id: blogId });
+      blog.comments.push({comment, username});
+      blog.save();
+      res.status(200).json({comments : blog.comments});
 
   } catch (err) {
       console.error(err);
@@ -77,7 +74,7 @@ const upload = multer({ storage: storage, filesize: 100000000 })
 
 router.post('/addblog', upload.single('file'), async (req, res) => {
   try {  
-    const {title, content, userId, tags, status, file} = req.body;
+    const {title, content, userId, tags, status, file, username} = req.body;
     let photoURL = '';
     const tag = JSON.parse(tags);
     if (req.file) {
@@ -93,6 +90,7 @@ router.post('/addblog', upload.single('file'), async (req, res) => {
       tags: tag,
       status,
       photo: photoURL,
+      username,
     })
     blog.save();
     res.status(200).json({blog});

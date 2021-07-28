@@ -55,17 +55,6 @@ router.put('/changeFollower', async (req, res) => {
   }
 })
 
-
-// router.put('/updateBio', async (req, res) => {
-//   const bio = req.query.bio;
-//   const id = req.query.id;
-//   try {
-//       const data = await User.findOneAndUpdate({_id: id}, {bio: bio});
-//       res.status(200).json({bio: bio});
-//   } catch (err) {
-//       console.error(err)
-//   }
-// })
 const storage1 = multer.diskStorage({
     destination: "./public/coverPhoto/",
     filename: function(req, file, cb){
@@ -77,7 +66,7 @@ const coverUpload = multer({storage: storage1, limits:{fileSize: 100000000}})
 
 // router.use('/public', express.static('public'));
 
-router.put('/saveBlog', coverUpload.single('file'), async (req, res) => {
+router.put('/updateBlog', coverUpload.single('file'), async (req, res) => {
     try {
         const {title, status, tags, blogId, content, file} = req.body
         const tag = JSON.parse(tags);
@@ -86,7 +75,8 @@ router.put('/saveBlog', coverUpload.single('file'), async (req, res) => {
             coverPhoto = req.protocol + '://' + req.get('host') + '/' + req.file.path;
         }
         else {
-            coverPhoto = file;
+            coverPhoto = file;// router.use('/public', express.static('public'));
+
         }
         const saveBlog = await Posts.findOneAndUpdate({_id: blogId}, { 
                 title,
@@ -115,8 +105,6 @@ const upload = multer({storage: storage, limits:{fileSize: 30000000}})
 
 router.put('/updateProfile', upload.single('file'), async (req, res) => {
     
-        console.log(req.file);
-        console.log(req.body);
         const avatarUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path;
         const { fullName, bio,  username} = req.body;
         try {

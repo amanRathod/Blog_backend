@@ -30,13 +30,11 @@ const PostSchema = new mongoose.Schema({
     comment: {
       type: String,
     },
-    loggedInUserId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+    username: {
+      type: String,
     },
     likes: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: String,
     }],
     createdAt: {
       type: Date,
@@ -52,9 +50,12 @@ const PostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
+  username: {
+    type: String,
+    required: true,
+  },
   likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
   }],
   createdAt: {
     type: Date,

@@ -43,7 +43,6 @@ router.post('/forgotPassword', async (req, res) => {
   user.expireToken = Date.now() + 30*60*1000 // 30 min
   user.save()
 
-  console.log('reset token',user.resetToken)
   const EmailToUser = {
     to: user.email,
     from: 'bittu90670@gmail.com',
@@ -94,8 +93,7 @@ router.post('/resetPassword', async (req, res) => {
   if(!user){
     res.status(302).json({message: "Try again session expired"});
   }
-  console.log('user', user.username);
-
+  
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(newPassword, salt);
 

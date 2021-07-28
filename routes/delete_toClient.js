@@ -15,6 +15,10 @@ router.delete('/deleteBlog/:id', async (req, res) => {
       posts.forEach(function(post) {
           postsMap[post._id] = post;
       })
+      Object.keys(postsMap).forEach(function(key) {
+        const val = postsMap[key];
+        postsMap[val._id] = val;
+      });
       res.status(200).json(postsMap);
 
     })

@@ -5,10 +5,9 @@ const User = require('../models/Login_User');
 const Posts = require('../models/Post');
 const { findOne } = require('../models/Post');
 
-router.get('/userId/:id', async (req, res, next) => {
+router.get('/userId/:id', async (req, res) => {
     const id  = (req.params.id);
     let data = [];
-
     try{
         let store = '';
         for(let i = 0; i < id.length; ++i){
@@ -27,6 +26,7 @@ router.get('/userId/:id', async (req, res, next) => {
     } catch(err) {
         console.error('errr',err.message);
     }
+    
 })
 
 router.get('/allPosts', async (req, res) => {
@@ -35,47 +35,28 @@ router.get('/allPosts', async (req, res) => {
     try {
         Posts.find({}, function(err, posts) {
             let postsMap = {};
-
-            posts.forEach(function(post) {
+            Object.keys(posts).forEach(function(key) {
+                let post = posts[key];
                 postsMap[post._id] = post;
+                
             })
+            
             res.status(200).json(postsMap);
 
-        })
-        // res.status.json(postsMap);
+        });
     } catch(err) {
         console.error('errr', err.message);
     }
 })
 
-router.get('/singleId/:id', async (req, res) => {
+router.get('/singleUserData/:username', async (req, res) => {
     
-    const id = req.params.id;
+    const username = req.params.username;
     try{
-        const data = await User.find({_id: id})
-        res.status(200).json(data[0]);
+        const data = await User.findOne({username: username})
+        res.status(200).send(data);
     } catch (err) {
         console.error(err.message);
-    }
-})
-
-router.get('/postsById/:id', async (req, res) => {
-    const id = req.params.id;
-    try {
-        
-        Posts.find({}, function(err, posts) {
-            let hashMap = {};
-            posts.forEach(function(post) {
-                if ( String(post.userId) === String(id) ){
-                    hashMap[post._id] = post;
-                }
-            })
-            res.status(200).send(hashMap);
-        })
-        
-        
-    } catch (err) {
-        console.error(err);
     }
 })
 
@@ -83,7 +64,16 @@ router.get('/UserByUsername/:username', async (req, res) => {
     try {
         const username = req.params.username;
         const data = await User.findOne({username: username});
-        res.send(data);
+        Posts.find({}, function(err, posts) {
+            let hashMap = {};
+            Object.keys(posts).forEach(function(key) {
+                let post = posts[key];
+                if ( post.username === username ){
+                    hashMap[post._id] = post;
+                }
+            })
+            res.status(200).send({'UserData': data, 'UserBlogs': hashMap});
+        });
     } catch (err) {
         console.error(err);
     }
@@ -105,8 +95,6 @@ router.get('/UserFollow', (req, res) => {
             })
             res.send(boolValue);
         })
-
-        
     } catch (err) {
         console.error(err);
     }
@@ -120,6 +108,6 @@ router.get('/postById/:Id', async (req, res) => {
     } catch (err) {
         console.error(err);
     }
-})
+})  
 
 module.exports = router;
