@@ -29,7 +29,7 @@ router.get('/userId/:id', async (req, res) => {
     
 })
 
-router.get('/allPosts', async (req, res) => {
+router.get('/allPosts', async (req, res, next) => {
     let data = [];
 
     try {
