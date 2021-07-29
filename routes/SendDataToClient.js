@@ -49,7 +49,7 @@ router.get('/allPosts', async (req, res, next) => {
     }
 })
 
-router.get('/singleUserData/:username', async (req, res) => {
+router.get('/singleUserData/:username', async (req, res, next) => {
     
     const username = req.params.username;
     try{
