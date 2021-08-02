@@ -48,6 +48,7 @@ router.put('/changeFollower', async (req, res) => {
               }
           }
       }
+      
       res.status(200).json({loggedIn: user1, profile: user2});
       
   } catch (err) {
@@ -85,11 +86,11 @@ router.put('/updateBlog', coverUpload.single('file'), async (req, res) => {
                 content,
                 photo: coverPhoto,
             });
-        res.status(200).json({blog: saveBlog});
+            res.status(200).json({success: 'Blog Updated successfuly'});
                    
     } catch (err) {
         console.error(err)
-        res.status(500).json(err)
+        res.status(500).json({error: err})
     }
 });
 

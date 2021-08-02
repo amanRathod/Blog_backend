@@ -9,11 +9,20 @@ const Posts = require('../models/Post');
 router.post('/addLikesId', async (req, res) => {
   const loggedUsername = req.query.loggedUsername;
   const blogId = req.query.blogId;
+  const toggle = req.query.toggle;
   try {
       const blog = await Posts.findOne({_id: blogId});
-      if(!blog.likes.includes(loggedUsername)) {
-          blog.likes.push(loggedUsername);
-          blog.save();
+      if(toggle === 'true'){
+        if(!blog.likes.includes(loggedUsername)) {
+            blog.likes.push(loggedUsername);
+            blog.save();
+        }
+      }
+      else {
+        if(blog.likes.includes(loggedUsername)) {
+            blog.likes.splice(blog.likes.indexOf(loggedUsername), 1);
+            blog.save();
+        }
       }
       res.status(200).json(blog.likes);
   } catch (err) {
@@ -25,18 +34,30 @@ router.post('/addLikesIntoComments', async (req, res) => {
   const loggedUsername = req.query.loggedUsername;
   const blogId = req.query.blogId;
   const commentId = req.query.commentId;
+  const toggle = req.query.toggle;
   try {
     const posts = await Posts.findOne({_id: blogId});
     for(let i = 0; i< posts.comments.length; ++i) {
         if(String(posts.comments[i]._id) === String(commentId)){
-            if(!posts.comments[i].likes.includes(loggedUsername)){
+          if(toggle === 'true'){  
+          if(!posts.comments[i].likes.includes(loggedUsername)){
                 posts.comments[i].likes.push(loggedUsername);
                 posts.save();
                 res.status(200).json(posts.comments);
                 break;
             }
+          }
+          else {
+            if(posts.comments[i].likes.includes(loggedUsername)){
+                posts.comments[i].likes.splice(posts.comments[i].likes.indexOf(loggedUsername), 1);
+                posts.save();
+                res.status(200).json(posts.comments);
+                break;
+            }
+          }
         }
     }
+  
     // res.status(302).send('user already liked')
     
       
@@ -76,6 +97,7 @@ router.post('/addblog', upload.single('file'), async (req, res) => {
   try {  
     const {title, content, userId, tags, status, file, username} = req.body;
     let photoURL = '';
+    console.log('titleee', title);
     const tag = JSON.parse(tags);
     if (req.file) {
       photoURL = req.protocol + '://' + req.get('host') + '/' + req.file.path;
@@ -93,7 +115,7 @@ router.post('/addblog', upload.single('file'), async (req, res) => {
       username,
     })
     blog.save();
-    res.status(200).json({blog});
+    res.status(200).json({success: 'Blog Published successfuly'});
   } catch (err) {
     console.error(err)
     req.status(500).json({error: err})

@@ -28,4 +28,24 @@ router.delete('/deleteBlog/:id', async (req, res) => {
   }
 })
 
+router.delete('/deleteComment', async (req, res) => {
+  try {
+    const CommentId = req.query.commentId;
+    const BlogId = req.query.blogId;
+    const posts = await Posts.findOne({_id: blogId});
+    
+    for(let i = 0; i< posts.comments.length; ++i) {
+      if(String(posts.comments[i]._id) === String(commentId)){
+        posts.comments.splice(i, 1);
+        break;
+      }
+    }
+    
+    res.status(200).send(posts.comments);
+    
+  } catch (err) {
+    console.log(err)
+  }
+})
+
 module.exports = router;
