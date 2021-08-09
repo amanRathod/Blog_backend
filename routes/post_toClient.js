@@ -33,6 +33,7 @@ router.post('/addLikesId', async (req, res) => {
 router.post('/addLikesIntoComments', async (req, res) => {
   const loggedUsername = req.query.loggedUsername;
   const blogId = req.query.blogId;
+  console.log(req.query)
   const commentId = req.query.commentId;
   const toggle = req.query.toggle;
   try {

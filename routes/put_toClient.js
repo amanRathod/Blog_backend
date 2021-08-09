@@ -5,6 +5,7 @@ const router = express.Router();
 const User = require('../models/Login_User');
 const Posts = require('../models/Post');
 const path = require('path');
+const sharp = require('sharp');
 
 router.put('/changeFollower', async (req, res) => {
   const loggedId = req.query.loggedInUsername;
@@ -71,6 +72,7 @@ router.put('/updateBlog', coverUpload.single('file'), async (req, res) => {
     try {
         const {title, status, tags, blogId, content, file} = req.body
         const tag = JSON.parse(tags);
+        console.log(req.body);
         let coverPhoto;
         if (req.file) {
             coverPhoto = req.protocol + '://' + req.get('host') + '/' + req.file.path;
@@ -79,7 +81,9 @@ router.put('/updateBlog', coverUpload.single('file'), async (req, res) => {
             coverPhoto = file;// router.use('/public', express.static('public'));
 
         }
-        const saveBlog = await Posts.findOneAndUpdate({_id: blogId}, { 
+        console.log('fileeee', file);
+
+        await Posts.findOneAndUpdate({_id: blogId}, { 
                 title,
                 status,
                 tags: tag,
@@ -101,13 +105,29 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({storage: storage, limits:{fileSize: 30000000}})
+const upload = multer({storage: storage, limits: {fileSize: 10000000}});
 
 
 router.put('/updateProfile', upload.single('file'), async (req, res) => {
-    
-        const avatarUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path;
-        const { fullName, bio,  username} = req.body;
+       
+        const { fullName, bio,  username, file} = req.body;
+        console.log(req.body);
+    //    await sharp(req.file.path)
+    //     .resize(128, 128)
+    //     .jpeg({ quality: 100 })
+    //     .toFile(
+    //         path.resolve(req.file.destination, 'resized', req.file.filename)
+    //     )
+        // console.log('resi', resizeImage);
+        console.log('filee', file)
+        let avatarUrl;
+        if(req.file) {
+            avatarUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+        }
+        else {
+            avatarUrl = file;
+        }
+
         try {
             const data = await User.findOneAndUpdate({username, username}, {
                 fullName,

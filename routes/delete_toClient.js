@@ -30,8 +30,8 @@ router.delete('/deleteBlog/:id', async (req, res) => {
 
 router.delete('/deleteComment', async (req, res) => {
   try {
-    const CommentId = req.query.commentId;
-    const BlogId = req.query.blogId;
+    const commentId = req.query.commentId;
+    const blogId = req.query.blogId;
     const posts = await Posts.findOne({_id: blogId});
     
     for(let i = 0; i< posts.comments.length; ++i) {
@@ -40,7 +40,7 @@ router.delete('/deleteComment', async (req, res) => {
         break;
       }
     }
-    
+    console.log(posts.comments);
     res.status(200).send(posts.comments);
     
   } catch (err) {
