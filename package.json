@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production nodemon server",
-    "dev": "cross-env NODE_ENV=development nodemon server"
+    "start": "nodemon babel-node src/server.js",
+    "dev:start": "clear; nodemon --exec babel-node src/server.js",
+    "pretest": "eslint --ignore-path .gitignore ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1009.0",
     "bcryptjs": "^2.4.3",
     "connect-mongo": "^4.4.1",
     "cookie-parser": "^1.4.5",
@@ -19,6 +21,8 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "express-validator": "^6.12.2",
+    "jsonwebtoken": "^8.5.1",
     "method-override": "^3.0.0",
     "mongoose": "^5.12.15",
     "morgan": "^1.10.0",
@@ -33,7 +37,14 @@
     "sharp": "^0.28.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/node": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.2",
     "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "eslint-config-strongloop": "^2.1.0",
     "nodemon": "^2.0.7"
   }
 }

@@ -1,0 +1,145 @@
+/* eslint-disable max-len */
+// const mongoose = require('mongoose');
+// const express = require('express');
+// const multer = require('multer');
+// const router = express.Router();
+// const User = require('../model/Login_User');
+// const Posts = require('../model/Post');
+// const path = require('path');
+// const sharp = require('sharp');
+
+// router.put('/changeFollower', async(req, res) => {
+//   const loggedId = req.query.loggedInUsername;
+//   const profileId = req.query.profileUsername;
+//   const toggleValue = req.query.toggleValue;
+
+//   const user1 = await User.findOne({_id: loggedId});
+//   const user2 = await User.findOne({_id: profileId});
+//   // if toggle is true then append the userId else delete
+
+//   try {
+//     if (toggleValue === 'true'){
+
+//       if (!user1.following.includes(profileId)){
+
+//         user1.following.push(profileId);
+//         user1.save();
+
+//       }
+//       if (!user2.followers.includes(loggedId)){
+
+//         user2.followers.push(loggedId);
+//         user2.save();
+//       }
+
+//     } else {
+//       for (let i = 0; i < user1.following.length; ++i) {
+
+//         if (String(user1.following[i]) === String(profileId)){
+//           user1.following.splice(i, 1);
+//           user1.save();
+//           break;
+//         }
+//       }
+
+//       for (let i = 0; i < user2.followers.length; ++i) {
+//         if (String(user2.followers[i]) === String(loggedId)) {
+//           user2.followers.splice(i, 1);
+//           user2.save();
+//           break;
+//         }
+//       }
+//     }
+
+//     res.status(200).json({loggedIn: user1, profile: user2});
+
+//   } catch (err) {
+//     console.error(err);
+//   }
+// });
+
+// const storage1 = multer.diskStorage({
+//   destination: './public/coverPhoto/',
+//   filename: function(req, file, cb){
+//     cb(null, 'IMAGE-' + Date.now() + path.extname(file.originalname));
+//   },
+// });
+
+// const coverUpload = multer({storage: storage1, limits: {fileSize: 100000000}});
+
+// // router.use('/public', express.static('public'));
+
+// router.put('/updateBlog', coverUpload.single('file'), async(req, res) => {
+//   try {
+//     const {title, status, tags, blogId, content, file} = req.body;
+//     const tag = JSON.parse(tags);
+//     console.log(req.body);
+//     let coverPhoto;
+//     if (req.file) {
+//       coverPhoto = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+//     } else {
+//       coverPhoto = file;// router.use('/public', express.static('public'));
+
+//     }
+//     console.log('fileeee', file);
+
+//     await Posts.findOneAndUpdate({_id: blogId}, {
+//       title,
+//       status,
+//       tags: tag,
+//       content,
+//       photo: coverPhoto,
+//     });
+//     res.status(200).json({success: 'Blog Updated successfuly'});
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({error: err});
+//   }
+// });
+
+// const storage = multer.diskStorage({
+//   destination: './public/uploads/',
+//   filename: function(req, file, cb){
+//     cb(null, 'IMAGE-' + Date.now() + path.extname(file.originalname));
+//   },
+// });
+
+// const upload = multer({storage: storage, limits: {fileSize: 10000000}});
+
+
+// router.put('/updateProfile', upload.single('file'), async(req, res) => {
+
+//   const { fullName, bio, username, file} = req.body;
+//   console.log(req.body);
+//   //    await sharp(req.file.path)
+//   //     .resize(128, 128)
+//   //     .jpeg({ quality: 100 })
+//   //     .toFile(
+//   //         path.resolve(req.file.destination, 'resized', req.file.filename)
+//   //     )
+//   // console.log('resi', resizeImage);
+//   console.log('filee', file);
+//   let avatarUrl;
+//   if (req.file) {
+//     avatarUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+//   } else {
+//     avatarUrl = file;
+//   }
+
+//   try {
+//     const data = await User.findOneAndUpdate({username, username}, {
+//       fullName,
+//       bio,
+//       image: avatarUrl,
+//     });
+//     res.status(200).json(data);
+
+//   } catch (err) {
+//     console.error(err);
+//     res.sendStatus(500);
+//   }
+// });
+
+
+// module.exports = router;
