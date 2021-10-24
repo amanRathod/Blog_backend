@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 const { validationResult } = require('express-validator');
 const Blog = require('../../../../model/blog');
+const Comment = require('../../../../model/comment');
 const User = require('../../../../model/user');
 const { uploadFile } = require('../../../../../s3');
 
@@ -16,21 +17,22 @@ exports.createBlog = async(req, res) => {
     }
 
     // destructure data
-    const { file } = req.body;
+    const { file, tag } = req.body;
+    const tags = JSON.parse(tag);
 
-    let photoURL = '';
+    let photoURL;
     if (req.file) {
       const awsUrl = await uploadFile(req.file);
       photoURL = awsUrl.Location;
     } else {
       photoURL = file;
     }
-    console.log(req.user);
     // save the blog
     const blog = await Blog.create({
       ...req.body,
       photo: photoURL,
       userId: req.user._id,
+      tags,
     });
 
     await User.findOneAndUpdate({username: req.user.username}, {$addToSet: {blog: blog._id}});
@@ -50,11 +52,12 @@ exports.createBlog = async(req, res) => {
 
 exports.updateBlog = async(req, res) => {
   try {
+    const { file, blogId, tag } = req.body;
+    const tags = JSON.parse(tag);
 
-    const { file, blogId } = req.body;
     let coverPhoto;
     if (req.file) {
-      const awsUrl = await uploadFile(req.file.path);
+      const awsUrl = await uploadFile(req.file);
       coverPhoto = awsUrl.Location;
     } else {
       coverPhoto = file;
@@ -64,6 +67,7 @@ exports.updateBlog = async(req, res) => {
     await Blog.findByIdAndUpdate({_id: blogId}, {
       ...req.body,
       photo: coverPhoto,
+      tags,
     });
 
     res.status(201).json({
@@ -82,13 +86,38 @@ exports.updateBlog = async(req, res) => {
 
 exports.deleteBlog = async(req, res) => {
   try {
-    const blogId = req.params.id;
+    const { blogId } = req.body;
 
-    await Blog.findByIdAndDelete({_id: blogId});
+    // deleted all comments of the blog
+    await Blog.findByIdAndDelete({_id: blogId}).populate('comments').exec((err, blog) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({
+          type: 'error',
+          message: 'Server Invalid',
+        });
+      }
+      // delete all comments of the blog
+      blog.comments.forEach(async(comment) => {
+        await Comment.findByIdAndDelete({_id: comment._id});
+      });
+    });
+
+    // delete blog from user's blog array
+    await User.findOneAndUpdate({username: req.user.username}, {$pull: {blog: blogId}});
+
+    const allBlog = await Blog.find({}).populate('userId').populate('comments').populate({
+      path: 'comments',
+      populate: {
+        path: 'userId',
+        select: 'fullName image username',
+      },
+    });
 
     res.status(201).json({
       type: 'success',
       message: 'blog deleted successfully',
+      allBlog,
     });
   } catch (err) {
     res.status(500).json({
@@ -126,6 +155,7 @@ exports.toggleLike = async(req, res) => {
 
     const { blogId, toggle } = req.body;
     const { username } = req.user;
+    console.log('toggle', toggle);
 
     const user = await User.findOne({username});
     if (!user) {
@@ -134,17 +164,14 @@ exports.toggleLike = async(req, res) => {
         message: 'user not found',
       });
     }
-    console.log(user);
-    console.log(req.body);
 
     // add userId into likes array of Blog collection if toggle is true and remove if toggle is false and vice versa
-    let blog;
     if (toggle) {
-      blog = await Blog.findByIdAndUpdate({_id: blogId}, {$addToSet: {likes: user._id}});
+      await Blog.findByIdAndUpdate({_id: blogId}, {$addToSet: {likes: user._id}});
     } else {
-      blog = await Blog.findByIdAndUpdate({_id: blogId}, {$pull: {likes: user._id}});
+      await Blog.findByIdAndUpdate({_id: blogId}, {$pull: {likes: user._id}});
     }
-    console.log(blog);
+    const blog = await Blog.findById({_id: blogId});
 
     res.status(201).json({
       data: blog.likes,

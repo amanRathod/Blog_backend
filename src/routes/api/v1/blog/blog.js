@@ -17,7 +17,7 @@ const upload = multer({storage: storage});
 router.post('/create', upload.single('file'), [
   body('title').not().isEmpty().withMessage('title is required'),
   body('content').not().isEmpty().withMessage('content is required'),
-  body('tags').not().isEmpty().withMessage('tags is required'),
+  body('tag').not().isEmpty().withMessage('tags is required'),
 ], authenticateUserToken, Blog.createBlog);
 
 router.put('/update', upload.single('file'), authenticateUserToken, Blog.updateBlog);
@@ -32,6 +32,6 @@ router.post('/toggle-like', [
 ], authenticateUserToken, Blog.toggleLike);
 
 // router.get('/:Id', Blog.getBlogById);
-router.use('/comment', authenticateUserToken, require('./comment'));
+router.use('/comment', require('./comment'));
 
 module.exports = router;

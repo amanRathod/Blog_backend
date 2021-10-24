@@ -15,7 +15,8 @@ const upload = multer({storage: storage});
 
 router.post('/add-follower', authenticateUserToken, User.addFollower);
 router.post('/remove-follower', authenticateUserToken, User.removeFollower);
-router.get('/', authenticateUserToken, User.getUserData);
-router.put('/update-profile', upload.single('file'), authenticateUserToken, User.updateProfile);
+router.get('/user-data', authenticateUserToken, User.getUserData);
+router.post('/user-profile', authenticateUserToken, User.getUserProfile);
+router.post('/update-profile', upload.single('file'), authenticateUserToken, User.updateProfile);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 const { validationResult } = require('express-validator');
 const Blog = require('../../../../model/blog');
@@ -21,11 +22,23 @@ exports.addComment = async(req, res) => {
       userId: req.user._id,
     });
 
-    await Blog.findOneAndUpdate({_id: blogId}, {$addToSet: {comments: comment._id}});
+    // add comment to blog comments array
+    await Blog.findOneAndUpdate({_id: blogId}, {$push: {comments: comment._id}});
+
+    // get the all comments from blog and populate it with user data and likes data from comment collection
+    const blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
+      path: 'comments',
+      populate: {
+        path: 'userId',
+        select: 'fullName image username',
+      },
+    });
+    // const comments = await blog.populate('comments').execPopulate();
 
     res.status(200).json({
       type: 'success',
       message: 'Comment added successfully',
+      data: blog.comments,
     });
 
   } catch (err) {
@@ -39,17 +52,59 @@ exports.addComment = async(req, res) => {
 
 exports.addLikes = async(req, res) => {
   try {
-    const { toggle, commentId } = req.body;
+    const { commentId, blogId } = req.body;
+    const { id } = req.user;
 
-    let comment;
-    if (toggle) {
-      comment = await Comment.findByIdAndUpdate({_id: commentId}, {$addToSet: {likes: req.user._id}});
+    // check if commentID is already liked by user or not if not then add like
+    const comment = await Comment.findOne({_id: commentId});
+    if (!comment.likes.includes(id)) {
+      await Comment.findOneAndUpdate({_id: commentId}, {$push: {likes: id}});
     } else {
-      comment = await Comment.findByIdAndUpdate({_id: commentId}, {$pull: {likes: req.user._id}});
+      await Comment.findOneAndUpdate({_id: commentId}, {$pull: {likes: id}});
     }
 
+    const blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
+      path: 'comments',
+      populate: {
+        path: 'userId',
+        select: 'fullName image username',
+      },
+    });
+    console.log(blog);
+
     res.status(200).json({
-      data: comment,
+      comments: blog.comments,
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      type: 'error',
+      message: 'Server Invalid',
+    });
+  }
+};
+
+exports.deleteComment = async(req, res) => {
+  try {
+    const { commentId, blogId } = req.body;
+
+    await Comment.findByIdAndDelete({_id: commentId});
+
+    await Blog.findOneAndUpdate({_id: blogId}, {$pull: {comments: commentId}});
+
+    const blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
+      path: 'comments',
+      populate: {
+        path: 'userId',
+        select: 'fullName image username',
+      },
+    });
+
+    res.status(200).json({
+      type: 'success',
+      message: 'comment deleted successfully',
+      data: blog.comments,
     });
 
   } catch (err) {
@@ -60,21 +115,26 @@ exports.addLikes = async(req, res) => {
   }
 };
 
-exports.deleteComment = async(req, res) => {
+exports.getAllComments = async(req, res) => {
   try {
-    const { commentId, blogId } = req.params;
+    const { blogId } = req.body;
 
-    await Comment.findByIdAndDelete({_id: commentId});
-
-    const comment = await Blog.findOne({_id: blogId}).populate('comments');
+    // get all comments from blog and populate it with user data and likes data from comment collection
+    const blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
+      path: 'comments',
+      populate: {
+        path: 'userId',
+        select: 'fullName image username',
+      },
+    });
 
     res.status(200).json({
-      type: 'success',
-      message: 'comment deleted successfully',
-      data: comment,
+      comments: blog.comments,
+      likes: blog.likes,
     });
 
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       type: 'error',
       message: 'Server Invalid',

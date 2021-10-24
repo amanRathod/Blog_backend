@@ -1,17 +1,26 @@
+/* eslint-disable no-dupe-keys */
 /* eslint-disable max-len */
 const { validationResult } = require('express-validator');
 const User = require('../../../../model/user');
+const Blog = require('../../../../model/blog');
 const { uploadFile } = require('../../../../../s3');
 
 exports.getUserData = async(req, res) => {
   try {
 
-    console.log(req.user);
-    const { username } = req.body;
+    const { username } = req.user;
     const userData = await User.findOne({username}).populate('blog').populate('followers').populate('following');
+    const allBlog = await Blog.find({}).populate('userId').populate('comments').populate({
+      path: 'comments',
+      populate: {
+        path: 'userId',
+        select: 'fullName image username',
+      },
+    });
 
     res.status(200).json({
       data: userData,
+      allBlog,
     });
 
   } catch (err) {
@@ -25,17 +34,18 @@ exports.getUserData = async(req, res) => {
 exports.updateProfile = async(req, res) => {
   try {
 
-    const { username } = req.user;
+    const { id } = req.user;
 
     if (req.file) {
       const url = await uploadFile(req.file);
       req.body.image = url.Location;
     }
-
-    const data = await User.findOneAndUpdate({username}, {
+    await User.findOneAndUpdate({_id: id}, {
       ...req.body,
     });
 
+    const data = await User.findById(id);
+    console.log(data);
     res.status(200).json({
       type: 'success',
       message: 'profile updated successfully',
@@ -61,28 +71,29 @@ exports.addFollower = async(req, res) => {
       });
     }
 
-    const { username } = req.body;
+    const { profileId } = req.body;
+
 
     // add user to followers array
-    const profileUser = await User.findOneAndUpdate({username}, {
-      $addToSet: {
+    await User.findByIdAndUpdate(profileId, {
+      $push: {
         followers: req.user._id,
       },
     });
 
     // add user to following array
-    const loggedInUser = await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: {
-        following: profileUser._id,
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: {
+        following: profileId,
       },
     });
 
+    const user = await User.findById(profileId).populate('followers');
 
     res.status(200).json({
       type: 'success',
       message: 'followed successfully',
-      loggedInUser,
-      profileUser,
+      followers: user.followers,
     });
 
   } catch (err) {
@@ -104,29 +115,52 @@ exports.removeFollower = async(req, res) => {
       });
     }
 
-    const { username } = req.body;
+    const { profileId } = req.body;
 
     // remove user from followers array
-    const profileUser = await User.findOneAndUpdate({username}, {
+    await User.findByIdAndUpdate(profileId, {
       $pull: {
         followers: req.user._id,
       },
     });
 
     // remove user from following array
-    const loggedInUser = await User.findByIdAndUpdate(req.user._id, {
+    await User.findByIdAndUpdate(req.user._id, {
       $pull: {
-        following: profileUser._id,
+        following: profileId,
       },
     });
+
+    const user = await User.findById(profileId).populate('followers');
 
     res.status(200).json({
       type: 'success',
       message: 'unfollowed successfully',
-      loggedInUser,
-      profileUser,
+      followers: user.followers,
     });
 
+  } catch (err) {
+    return res.status(500).json({
+      type: 'error',
+      message: 'Server is Invalid',
+    });
+  }
+};
+
+exports.getUserProfile = async(req, res) => {
+  try {
+    const { username } = req.body;
+
+    const userData = await User.findOne({username}).populate('followers').populate('following').populate('blog').populate({
+      path: 'blog',
+      populate: {
+        path: 'userId',
+      },
+    });
+
+    res.status(200).json({
+      data: userData,
+    });
   } catch (err) {
     return res.status(500).json({
       type: 'error',

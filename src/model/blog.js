@@ -16,7 +16,14 @@ const BlogSchema = new mongoose.Schema({
   photo: {
     type: String,
   },
-  tags: [String],
+  tags: [{
+    id: {
+      type: String,
+    },
+    text: {
+      type: String,
+    },
+  }],
   comments: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Comment',
