@@ -23,7 +23,6 @@ exports.forgotPassword = async(req, res, next) => {
     }
 
     const { email } = req.body;
-    console.log(req.body);
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(200).json({
@@ -79,7 +78,6 @@ exports.forgotPassword = async(req, res, next) => {
 exports.resetPassword = async(req, res, next) => {
   try {
 
-    console.log(req.body);
     const { password, token } = req.body;
 
     // find user by token and verify if token valid or expired ( one hour validity )
@@ -87,7 +85,7 @@ exports.resetPassword = async(req, res, next) => {
       passwordResetToken: token,
       passwordResetExpires: { $gt: Date.now() },
     });
-    console.log(user);
+
     if (!user) {
       return res.status(400).json({
         status: 'error',

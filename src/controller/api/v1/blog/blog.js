@@ -20,6 +20,7 @@ exports.createBlog = async(req, res) => {
     const { file, tag } = req.body;
     const tags = JSON.parse(tag);
 
+    // upload file to aws
     let photoURL;
     if (req.file) {
       const awsUrl = await uploadFile(req.file);
@@ -27,6 +28,7 @@ exports.createBlog = async(req, res) => {
     } else {
       photoURL = file;
     }
+
     // save the blog
     const blog = await Blog.create({
       ...req.body,
@@ -155,7 +157,6 @@ exports.toggleLike = async(req, res) => {
 
     const { blogId, toggle } = req.body;
     const { username } = req.user;
-    console.log('toggle', toggle);
 
     const user = await User.findOne({username});
     if (!user) {
@@ -165,7 +166,7 @@ exports.toggleLike = async(req, res) => {
       });
     }
 
-    // add userId into likes array of Blog collection if toggle is true and remove if toggle is false and vice versa
+    // add userId into likes array according to toggle
     if (toggle) {
       await Blog.findByIdAndUpdate({_id: blogId}, {$addToSet: {likes: user._id}});
     } else {

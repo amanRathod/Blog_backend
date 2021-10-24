@@ -9,6 +9,8 @@ exports.getUserData = async(req, res) => {
   try {
 
     const { username } = req.user;
+
+    // get userData  including blogs
     const userData = await User.findOne({username}).populate('blog').populate('followers').populate('following');
     const allBlog = await Blog.find({}).populate('userId').populate('comments').populate({
       path: 'comments',
@@ -45,7 +47,6 @@ exports.updateProfile = async(req, res) => {
     });
 
     const data = await User.findById(id);
-    console.log(data);
     res.status(200).json({
       type: 'success',
       message: 'profile updated successfully',

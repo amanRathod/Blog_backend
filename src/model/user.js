@@ -34,10 +34,10 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Blog',
   }],
-  resetToken: {
+  passwordResetToken: {
     type: String,
   },
-  expireToken: {
+  passwordResetExpires: {
     type: Date,
   },
   createdAt: {

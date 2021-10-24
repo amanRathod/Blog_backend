@@ -55,7 +55,7 @@ exports.addLikes = async(req, res) => {
     const { commentId, blogId } = req.body;
     const { id } = req.user;
 
-    // check if commentID is already liked by user or not if not then add like
+    // check if commentID is already liked by user or not
     const comment = await Comment.findOne({_id: commentId});
     if (!comment.likes.includes(id)) {
       await Comment.findOneAndUpdate({_id: commentId}, {$push: {likes: id}});
@@ -70,7 +70,6 @@ exports.addLikes = async(req, res) => {
         select: 'fullName image username',
       },
     });
-    console.log(blog);
 
     res.status(200).json({
       comments: blog.comments,
@@ -119,7 +118,7 @@ exports.getAllComments = async(req, res) => {
   try {
     const { blogId } = req.body;
 
-    // get all comments from blog and populate it with user data and likes data from comment collection
+    // all comments from blog
     const blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
       path: 'comments',
       populate: {

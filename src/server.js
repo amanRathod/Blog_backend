@@ -16,6 +16,11 @@ app.use(express.urlencoded({extended: true}));
 app.use(cors());
 app.use(morgan('dev'));
 
+// disable console log for production mode
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+}
+
 app.use('/', require('./routes'));
 
 const PORT = process.env.PORT || 4444;
