@@ -11,8 +11,6 @@ router.post('/login', [
 ], User.login);
 
 router.post('/register', [
-  check('email').isEmail(),
-  check('password').isLength({ min: 8 }),
   body('fullName').not().isEmpty().withMessage('Full name is required'),
   body('username').not().isEmpty().withMessage('Username is required'),
 ], User.register);
