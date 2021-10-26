@@ -1,7 +1,6 @@
 # Blog
 
-Blog is a highly scalable and high performant one stop solution to:
-- Write and Manage your blog
+Blog is a free developer blogging platform that allows you to publish articles and helps you to stay connected with a global developer
 
 
 # Application Links
