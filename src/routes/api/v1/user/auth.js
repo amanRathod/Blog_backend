@@ -4,11 +4,12 @@ const router = express.Router();
 const { check, body } = require('express-validator');
 const User = require('../../../../controller/api/v1/user/auth');
 const reset_password = require('../../../../controller/api/v1/user/reset_password');
+const ratelimiter = require('../../../../../rate-limiter');
 
 router.post('/login', [
   check('email').isEmail(),
   check('password').isLength({ min: 8 }),
-], User.login);
+], ratelimiter({ secondsWindow: 10, allowedHits: 4 }), User.login);
 
 router.post('/register', [
   body('fullName').not().isEmpty().withMessage('Full name is required'),

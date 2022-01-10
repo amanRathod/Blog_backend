@@ -4,6 +4,7 @@ const Blog = require('../../../../model/blog');
 const Comment = require('../../../../model/comment');
 const User = require('../../../../model/user');
 const { uploadFile } = require('../../../../../s3');
+const redis = require('../../../../../redis-client');
 
 exports.createBlog = async(req, res) => {
   try {
@@ -116,6 +117,8 @@ exports.deleteBlog = async(req, res) => {
       },
     });
 
+    redis.setex('allBlog', 3600, JSON.stringify(allBlog));
+
     res.status(201).json({
       type: 'success',
       message: 'blog deleted successfully',
@@ -131,11 +134,23 @@ exports.deleteBlog = async(req, res) => {
 
 exports.getAllBlog = async(req, res) => {
   try {
-    const blog = await Blog.find({}).populate('userId');
+    let allBlog = await redis.get('allBlog');
+    if (allBlog) {
+      allBlog = JSON.parse(allBlog);
+      res.status(200).json({
+        data: (allBlog),
+      });
+
+      redis.setex('allBlog', 3600, JSON.stringify(allBlog));
+      return;
+    }
+    allBlog = await Blog.find({}).populate('userId');
+    redis.setex('allBlog', 3600, JSON.stringify(allBlog));
 
     res.status(200).json({
-      data: blog,
+      data: allBlog,
     });
+
   } catch (err) {
     res.status(500).json({
       type: 'error',

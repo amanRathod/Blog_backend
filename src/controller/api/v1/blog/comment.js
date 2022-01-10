@@ -3,6 +3,7 @@
 const { validationResult } = require('express-validator');
 const Blog = require('../../../../model/blog');
 const Comment = require('../../../../model/comment');
+const redis = require('../../../../../redis-client');
 
 exports.addComment = async(req, res) => {
   try {
@@ -33,7 +34,8 @@ exports.addComment = async(req, res) => {
         select: 'fullName image username',
       },
     });
-    // const comments = await blog.populate('comments').execPopulate();
+
+    redis.setex(`blog:${blogId}`, 3600, JSON.stringify(blog));
 
     res.status(200).json({
       type: 'success',
@@ -70,6 +72,7 @@ exports.addLikes = async(req, res) => {
         select: 'fullName image username',
       },
     });
+    redis.setex(`blog:${blogId}`, 3600, JSON.stringify(blog));
 
     res.status(200).json({
       comments: blog.comments,
@@ -117,15 +120,36 @@ exports.deleteComment = async(req, res) => {
 exports.getAllComments = async(req, res) => {
   try {
     const { blogId } = req.body;
+    let blog = await redis.get(`blog:${blogId}`);
+
+    if (blog) {
+      blog = JSON.parse(blog);
+      res.status(200).json({
+        comments: blog.comments,
+        likes: blog.likes,
+      });
+
+      blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
+        path: 'comments',
+        populate: {
+          path: 'userId',
+          select: 'fullName image username',
+        },
+      });
+
+      redis.setex(`blog:${blogId}`, 3600, JSON.stringify(blog));
+      return;
+    }
 
     // all comments from blog
-    const blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
+    blog = await Blog.findOne({_id: blogId}).populate('comments').populate({
       path: 'comments',
       populate: {
         path: 'userId',
         select: 'fullName image username',
       },
     });
+    redis.setex(`blog:${blogId}`, 3600, JSON.stringify(blog));
 
     res.status(200).json({
       comments: blog.comments,
