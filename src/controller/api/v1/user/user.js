@@ -15,11 +15,10 @@ exports.getUserData = async(req, res) => {
     let userData = await redis.get(`user:${username}`);
     let allBlog = await redis.get('allBlog');
     if (userData && allBlog) {
-      console.log('cache');
       allBlog = JSON.parse(allBlog);
       res.status(200).json({
         data: JSON.parse(userData),
-        allBlog: JSON.parse(allBlog),
+        allBlog,
       });
 
       // after sending data to client, we can update the cache in redis server
@@ -190,7 +189,6 @@ exports.getUserProfile = async(req, res) => {
     let userData = await redis.get(`user:${username}`);
 
     if (userData) {
-      console.log('cached');
       res.status(200).json({
         data: JSON.parse(userData),
       });
