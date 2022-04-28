@@ -40,7 +40,7 @@ exports.register = async(req, res) => {
     await User.create({
       ...req.body,
       password: hashedPassword,
-      image: 'https://assignment-management.s3.amazonaws.com/index.png',
+      image: 'https://blog-dev-sample.s3.amazonaws.com/index.png',
     });
 
     res.status(200).json({

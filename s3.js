@@ -16,11 +16,12 @@ const s3 = new S3({
 // uploads a file to s3
 function uploadFile(file) {
   const fileStream = fs.createReadStream(file.path);
-
   const uploadParams = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Body: fileStream,
     Key: file.filename,
+    ContentType: file.mimetype,
+    // ACL: 'private',
   };
 
   return s3.upload(uploadParams).promise();

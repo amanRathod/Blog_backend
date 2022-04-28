@@ -8,6 +8,9 @@ const app = express();
 // app.disable('x-powered-by');
 
 dotenv.config();
+
+// pooling connection for monogoDB connection pooling of pool size is 10
+
 ConnectDB();
 
 // middleware

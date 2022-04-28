@@ -101,9 +101,9 @@ exports.deleteBlog = async(req, res) => {
         });
       }
       // delete all comments of the blog
-      blog.comments.forEach(async(comment) => {
-        await Comment.findByIdAndDelete({_id: comment._id});
-      });
+      // blog.comments.forEach(async(comment) => {
+      //   await Comment.findByIdAndDelete({_id: comment._id});
+      // });
     });
 
     // delete blog from user's blog array
@@ -140,6 +140,7 @@ exports.getAllBlog = async(req, res) => {
       res.status(200).json({
         data: (allBlog),
       });
+      console.log('allbloggg', allBlog);
 
       redis.setex('allBlog', 3600, JSON.stringify(allBlog));
       return;

@@ -5,12 +5,11 @@ const User = require('../../../../model/user');
 const Blog = require('../../../../model/blog');
 const { uploadFile } = require('../../../../../s3');
 const redis = require('../../../../../redis-client');
-const user = require('../../../../model/user');
+// const user = require('../../../../model/user');
 
 exports.getUserData = async(req, res) => {
   try {
     const { username } = req.user;
-
     // redis
     let userData = await redis.get(`user:${username}`);
     let allBlog = await redis.get('allBlog');
@@ -26,6 +25,20 @@ exports.getUserData = async(req, res) => {
         .populate('blog')
         .populate('followers')
         .populate('following');
+
+      allBlog = await Blog.find({})
+        .populate('userId')
+        .populate('comments')
+        .populate({
+          path: 'comments',
+          populate: {
+            path: 'userId',
+            select: 'fullName image username',
+          },
+        });
+      // setex(key, seconds, value)
+      redis.setex(`user:${username}`, 3600, JSON.stringify(userData));
+      redis.setex('allBlog', 3600, JSON.stringify(allBlog));
 
       redis.setex(`user:${username}`, 3600, JSON.stringify(userData));
       return;
@@ -58,6 +71,7 @@ exports.getUserData = async(req, res) => {
       allBlog,
     });
   } catch (err) {
+    console.log('errorr', err);
     return res.status(500).json({
       type: 'error',
       message: 'Server is Invalid',
