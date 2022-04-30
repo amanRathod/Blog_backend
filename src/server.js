@@ -21,6 +21,11 @@ app.use(morgan('dev'));
 
 // disable console log for production mode
 if (process.env.NODE_ENV === 'production') {
+  // useCahing when in produvtion mode to cache the response for 1 hour 
+  app.use(morgan('common', {
+    skip: function(req, res) { return res.statusCode < 400; },
+    stream: process.stderr,
+  }));
   console.log = () => {};
 }
 
