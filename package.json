@@ -6,14 +6,17 @@
   "scripts": {
     "start": "nodemon babel-node src/server.js",
     "dev:start": "clear; nodemon --exec babel-node src/server.js",
-    "pretest": "eslint --ignore-path .gitignore ."
+    "pretest": "eslint --ignore-path .gitignore .",
+    "test": "mocha --timeout 10000 ./src/test/*.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "autocannon": "^7.9.0",
     "aws-sdk": "^2.1009.0",
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "connect-mongo": "^4.4.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -22,19 +25,18 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "express-validator": "^6.12.2",
+    "helmet": "^5.0.2",
     "ioredis": "^4.28.2",
+    "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "method-override": "^3.0.0",
     "mongoose": "^5.12.15",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
+    "newrelic": "^8.11.0",
     "nodemailer": "^6.6.2",
     "nodemailer-sendgrid": "^1.0.3",
     "nodemon": "^2.0.7",
-    "passport": "^0.4.1",
-    "passport-github2": "^0.1.12",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "sharp": "^0.28.3"
   },
@@ -44,8 +46,13 @@
     "@babel/preset-env": "^7.15.8",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
-    "eslint-config-strongloop": "^2.1.0"
+    "eslint-config-strongloop": "^2.1.0",
+    "mocha": "^10.0.0",
+    "supertest": "^6.2.3",
+    "loadtest": "*"
   }
 }

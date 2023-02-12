@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 const { validationResult } = require('express-validator');
 const Blog = require('../../../../model/blog');
@@ -135,13 +136,15 @@ exports.deleteBlog = async(req, res) => {
 exports.getAllBlog = async(req, res) => {
   try {
     let allBlog = await redis.get('allBlog');
+    console.time();
+    await Blog.find({}).populate('userId');
+    console.timeEnd();
     if (allBlog) {
       allBlog = JSON.parse(allBlog);
       res.status(200).json({
         data: (allBlog),
       });
-      console.log('allbloggg', allBlog);
-
+      allBlog = await Blog.find({}).populate('userId');
       redis.setex('allBlog', 3600, JSON.stringify(allBlog));
       return;
     }
@@ -153,6 +156,7 @@ exports.getAllBlog = async(req, res) => {
     });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       type: 'error',
       message: 'Server Invalid',

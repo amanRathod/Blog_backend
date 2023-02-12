@@ -24,7 +24,7 @@ router.put('/update', upload.single('file'), authenticateUserToken, Blog.updateB
 
 router.put('/delete', authenticateUserToken, Blog.deleteBlog);
 
-router.get('/all-blog', authenticateUserToken, Blog.getAllBlog);
+router.get('/all-blog', Blog.getAllBlog);
 
 router.post('/toggle-like', [
   body('toggle').not().isEmpty().withMessage('toggle is required'),
@@ -35,3 +35,29 @@ router.post('/toggle-like', [
 router.use('/comment', require('./comment'));
 
 module.exports = router;
+
+
+// @Post('upload')
+//   @ApiOperation({
+//     summary: 'Upload a borrower image',
+//   })
+//   @CheckAbilities(AuthAction.UPDATE, AuthSubject.BORROWER)
+//   @UseInterceptors(
+//     FileFieldsInterceptor(
+//       [
+//         { name: 'image', maxCount: 1 },
+//         { name: 'pledgeVideo', maxCount: 1 },
+//       ],
+//       saveFileToStorage,
+//     ),
+//   )
+//   async uploadImage(
+//     @UploadedFiles()
+//     files: {
+//       image?: Express.Multer.File;
+//       pledgeVideo?: Express.Multer.File;
+//     },
+//   ) {
+//     console.log('image', files);
+//     return;
+//   }

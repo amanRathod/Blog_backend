@@ -1,0 +1,16 @@
+const fs = require('fs');
+
+const readFile = () => {
+  let data = fs.readFileSync('sentences.txt');
+  let sentences = data.toString();
+  return sentences;
+};
+
+const getWords = (text) => {
+  let allSentences = text.split('\n');
+  let flatSentence = allSentences.join(' ');
+  let words = flatSentence.split(' ');
+  words = words.map((word) => word.trim().toLowerCase());
+  return words;
+};
+
