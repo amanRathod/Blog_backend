@@ -52,21 +52,21 @@ app.use('/', require('./routes'));
 
 const PORT = process.env.PORT || 5000;
 
-if (cluster.isMaster) {
-  for (let i = 0; i < numCpu; ++i) {
-    cluster.fork();
-  }
+// if (cluster.isMaster) {
+//   for (let i = 0; i < numCpu; ++i) {
+//     cluster.fork();
+//   }
 
-  cluster.on('exit', (worker, code, signal) => {
-    cluster.fork();
-  });
-} else {
-  app.listen(PORT, () => {
-    console.log(`server ${process.pid} started at http://localhost:${PORT}`);
-  });
-}
+//   cluster.on('exit', (worker, code, signal) => {
+//     cluster.fork();
+//   });
+// } else {
+//   app.listen(PORT, () => {
+//     console.log(`server ${process.pid} started at http://localhost:${PORT}`);
+//   });
+// }
 
-// app.listen(PORT, () => {
-//   console.log(`server ${process.pid} started at http://localhost:${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`server ${process.pid} started at http://localhost:${PORT}`);
+});
 module.exports = app;
