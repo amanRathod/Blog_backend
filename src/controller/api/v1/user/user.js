@@ -123,18 +123,23 @@ exports.addFollower = async(req, res) => {
 
     const { profileId } = req.body;
 
-    // add user to followers array
     await User.findByIdAndUpdate(profileId, {
-      $push: {
+      $addToSet: {
         followers: req.user._id,
       },
     });
 
-    // add user to following array
-    await User.findByIdAndUpdate(req.user._id, {
-      $push: {
-        following: profileId,
-      },
+    await User.findById(profileId, (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          type: 'error',
+          message: 'Server is Invalid',
+        });
+      }
+      if (result.following.indexOf(req.user._id) === -1) {
+        result.following.push(req.user._id);
+        result.save();
+      }
     });
 
     const user = await User.findById(profileId).populate('followers');
